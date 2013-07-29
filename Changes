@@ -1,0 +1,69 @@
+* Changes to hlobject
+  * Changed default value to hlobject=""
+  * Added support for "set" lines in elvis.syn, to allow setting of options
+    in a language-dependent way.
+
+* Changes to "fmt" program
+  * It now compiles as "elvfmt"
+  * It accepts -c for crown lines, and -ichars to allow chars in indentation.
+    Together, these make it work well for formatting C/C++ comments.
+  * The argument processing is now more POSIX-like (with ganged options).
+
+* Changes to :help command
+  * Now supports HTML help, like ":help <table".
+  * Now supports display mode help, like ":help di syntax"
+  * Allows trailing = in ":help set option=" lines; nice after name completion.
+
+* Changes to folding
+  * Multi-line moves across folded lines should work now.  Previously, only
+    single-line motions across folds worked right.  This bug also affected
+    paging -- ^B didn't work if a fold was at the top of the window.
+
+* Miscellany
+  * Tweaked calc.c to allow "make calc" to work again.
+
+------------------------------------------------------------------------------
+In 2.2c, patch 1 & 2...
+
+Bug fixes in searching:
+ * incsearch didn't support ^V to quote backspace characters, etc.
+ * In incsearch, /<Enter> didn't repeat the previous search.
+ * The autoselect option was recently broken, but now works
+ * In incsearch, some partial regular expressions caused elvis to hang.
+   /\ was an example of this.
+ * After exiting incsearch via <Enter> or <Esc>, the search information is
+   now removed from the status line.  This should make it easier to know when
+   you're in an incsearch, or in the normal command state.
+
+Bug fixes in text objects and hlobject
+ * Several text objects, including a{, caused core dumps when used on an empty
+   buffer.  This occured whether the text object was part of a command, or
+   merely used in the value of the hlobject option.
+ * With multiple windows, highlighting in one window might get stuck (i.e.,
+   it didn't follow the cursor anymore) if you briefly switched to a different
+   window.
+ * hlobject would sometimes cause syntax highlighting to be lost, toward the
+   end of the highlighted area.
+ * Not a bug, but an extension: In the value of hlobject, you can now add a
+   "V" prefix to any text object to force its highlighting to affect whole
+   lines.  So hlobject="a{" still causes the exact extent of the block to be
+   highlighted, but hlobject="Va{" causes whole lines (including the lines
+   which contain the { and } characters) to be highlighted.
+
+Other bugs:
+ * Added an error message when a script contains an unterminated {...} block.
+   This is suddenly important, because users may be tempted to put a line
+   such as ":set hllayers=9 hlobject=a{" in their .exrc file, but the "{"
+   at the end of that line will cause elvis' ex command parser to become
+   confused, and until now the user was given no clues regarding the cause.
+ * The <Enter> key wasn't advancing the cursor to the next line.
+ * Guide lines (via the guidewidth option) were being drawn incorrectly on
+   the ~ rows after the end of the buffer.  Those rows shouldn't have guide
+   lines at all.
+
+Miscellaneous changes:
+ * Added a list() function to the built-in calculator.  It converts control
+   characters into printable sequences.  I needed this function to make the
+   incremental search string be displayed correctly after you've typed ^V^H.
+ * Added some NetBSD-specific tweaks to the "configure" script.
+ * Fixed a couple of things that caused assert() statements to fail.
